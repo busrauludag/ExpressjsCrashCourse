@@ -1,30 +1,15 @@
 const express = require('express');
 const path = require('path');
 const logger = require('./middleware/logger');
-const members = require('./Memebers');
 
 const app = express();
 
 // Init Middleware
 app.use(logger);
 
-// Gets All Members
-app.get('/api/members', (req, res) => {
-  res.json(members);
-});
-
-// Get Single Member
-app.get('/api/members/:id', (req, res) => {
-  // res.send(req.params.id);
-  const found = members.some(memeber => memeber.id === parseInt(req.params.id)); // it returns true or false
-
-  if(found){
-    res.json(members.filter(member => member.id === parseInt(req.params.id)));
-  }else{
-    res.status(400).json({ msg: `No member with the id of ${req.params.id}` });
-  }
-  
-});
+// Body Parser Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 /**
  * app.get('/', (req, res) => {
@@ -34,6 +19,9 @@ app.get('/api/members/:id', (req, res) => {
 
 // Set Static Folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Call Memeber API Route
+app.use('/api/members', require('./routes/api/members'));
 
 const PORT = process.env.PORT || 5000;
 
